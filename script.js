@@ -34,10 +34,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalDescription = document.getElementById('modalDescription');
 
 
-    // --- Games Data (with updated sizes) ---
+    // --- Games Data (مع تعديل ترتيب Baseball 9 وعرض أول 4 ألعاب) ---
     const gamesData = [
         {
-            id: 1,
+            id: 11, // تم تغيير الـ ID لجعلها في الأعلى كـ "جديدة"
+            title: 'Baseball 9',
+            category: 'Sports',
+            image: 'images/Baseball 9.png', // تأكد من وجود هذه الصورة في مجلد images
+            size: '280 MB',
+            rating: '4.7',
+            downloadUrl: 'https://installchecker.com/cl/i/99ol5l',
+            description: {
+                genre: 'Sports, Baseball',
+                platform: 'Android',
+                modFeatures: 'Unlimited Money & Gems – All Players Unlocked',
+                overview: `Step up to the plate and hit it out of the park with Baseball 9 Modded! This highly-rated baseball game offers fast-paced, realistic gameplay with intuitive controls and stunning graphics. Create your dream team, recruit star players, and lead them to victory in various leagues. The modded version provides unlimited money and gems, allowing you to upgrade your team and unlock all players without grinding.`,
+                keyFeatures: [
+                    'Fast-paced, realistic baseball gameplay.',
+                    'Intuitive touch controls for batting and pitching.',
+                    'Recruit and customize players with unique skills.',
+                    'Compete in various leagues and tournaments.',
+                    'Stunning 3D graphics and smooth animations.'
+                ],
+                whyChooseMod: [
+                    '<strong>Unlimited Money & Gems:</strong> Freely upgrade facilities and player stats.',
+                    '<strong>All Players Unlocked:</strong> Build your ultimate team from the start without limitations.',
+                    '<strong>Ad-Free Experience:</strong> Enjoy uninterrupted gameplay.'
+                ]
+            },
+        },
+        {
+            id: 1, // تم تغيير الـ ID للتوضيح فقط، الأهم هو ترتيبها
             title: 'Hill Climb Racing',
             category: 'Racing',
             image: 'images/Hill Climb Racing.png',
@@ -146,10 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Real tracks from all over the world.',
                     'Stunning graphics and precise details.',
                     'Various racing events and daily challenges.'
-                ],
-                whyChooseMod: [
-                    '<strong>Unlimited Money & Gold:</strong> To buy and upgrade all luxury cars.',
-                    '<strong>All Cars Unlocked:</strong> Enjoy driving all available cars from the start.'
                 ]
             },
         },
@@ -257,12 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Realistic 3D graphics with dynamic lighting effects.',
                     'Full car upgrades: Engine, Tires, Suspension, and more.',
                     'Competitive online races with fair matchmaking.'
-                ],
-                whyChooseMod: [
-                    '✔️ <strong>Everything Unlocked:</strong> Enjoy all features and content from the start.',
-                    '✔️ <strong>No Ads:</strong> Smooth and uninterrupted gaming experience.',
-                    '✔️ <strong>Unlimited Money & Gems:</strong> Upgrade and buy everything you need effortlessly.',
-                    '✔️ <strong>Optimized and Smooth Gameplay:</strong> Enjoy the best game performance.'
                 ]
             },
         }
@@ -316,7 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderNewGamesSwiper(games) {
         newGamesSwiperWrapper.innerHTML = '';
-        const recentGames = games.slice(0, 10);
+        // عرض أول 4 ألعاب فقط في قسم "New Games Added"
+        const recentGames = games.slice(0, 4); 
         recentGames.forEach(game => {
             const slide = document.createElement('div');
             slide.classList.add('swiper-slide');
@@ -424,144 +442,117 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const filteredGames = gamesData.filter(game => game.title.toLowerCase().includes(query));
         allGamesTitle.textContent = `Search Results for "${query}"`;
-        newGamesSection.classList.add('hidden');
+        newGamesSection.classList.add('hidden'); // Hide "New Games" section on search
         renderAllGamesGrid(filteredGames);
-        if (filteredGames.length === 0) {
-            allGamesGrid.innerHTML = `<p style="text-align: center; color: var(--light-text-color);">No results matching "${query}".</p>`;
-        }
+        // No need to re-render new games swiper on search
     };
 
     searchButton.addEventListener('click', performSearch);
-    searchInput.addEventListener('input', performSearch);
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') performSearch();
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            performSearch();
+        } else if (searchInput.value.trim() === '' && e.key === 'Backspace') {
+            // If search input becomes empty, revert to showing all games
+            performSearch();
+        }
     });
 
-    // --- Game Detail Page and New Download Logic ---
-    function showGameDetail(game) {
-        contentSections.forEach(section => section.classList.add('hidden'));
-        gameDetailSection.classList.remove('hidden');
-        
-        detailGameThumbnail.src = game.image;
-        detailGameThumbnail.alt = game.title;
-        detailGameThumbnail.onerror = function() {
-            this.src = 'images/default-game.png';
-        };
-        
-        detailGameTitle.textContent = game.title;
-        detailGameSize.textContent = game.size;
-        detailGameRating.textContent = game.rating;
-        
-        const desc = game.description;
-        detailGameDescription.innerHTML = `
-            <p class="game-meta">🎮 Genre: <strong>${desc.genre}</strong> | 📱 Platform: <strong>${desc.platform}</strong></p>
-            <p class="game-mod-features">🆓 MOD Features: <strong>${desc.modFeatures}</strong></p>
-            <h3>🔥 Game Overview:</h3>
-            <p>${desc.overview}</p>
-            <h3>🎯 Key Features:</h3>
-            <ul>
-                ${desc.keyFeatures.map(feature => `<li>${feature}</li>`).join('')}
-            </ul>
-            <h3>🎮 Why choose the MOD APK version?</h3>
-            <ul>
-                ${desc.whyChooseMod ? desc.whyChooseMod.map(item => `<li>${item}</li>`).join('') : ''}
-            </ul>
-            <p class="download-call-to-action">📥 Download now and become the ultimate racing legend!</p>
-        `;
-
-        // Reset and hide download related elements
-        openDownloadProcessButton.classList.remove('hidden'); // Show original button
-        countdownContainer.classList.add('hidden'); // Hide countdown
-        finalDownloadLink.classList.add('hidden'); // Hide final link
-        finalDownloadLink.href = '#'; // Reset href
-        
-        // Set up click listener for the main download button
-        openDownloadProcessButton.onclick = () => initiateDownloadProcess(game.downloadUrl);
-        window.scrollTo(0, 0);
+    // --- Game Detail Page Functionality ---
+    function showSection(sectionToShow) {
+        contentSections.forEach(section => {
+            section.classList.add('hidden');
+        });
+        sectionToShow.classList.remove('hidden');
     }
 
-    // --- New Download Process Function ---
-    function initiateDownloadProcess(downloadUrl) {
-        openDownloadProcessButton.classList.add('hidden'); // Hide the main download button permanently after click
-        countdownContainer.classList.remove('hidden'); // Show the countdown container
-        finalDownloadLink.classList.add('hidden'); // Ensure final link is hidden initially
+    let currentDownloadCountdownInterval;
 
-        let timeLeft = 5; // Start countdown from 5 seconds
-        countdownTimer.textContent = `Generating Link in ${timeLeft}s...`;
+    function showGameDetail(game) {
+        showSection(gameDetailSection);
+        detailGameThumbnail.src = game.image;
+        detailGameThumbnail.alt = game.title;
+        detailGameTitle.textContent = game.title;
+        detailGameSize.textContent = `Size: ${game.size}`;
+        detailGameRating.textContent = `Rating: ${game.rating}`;
 
-        const countdownInterval = setInterval(() => {
-            timeLeft--;
-            if (timeLeft > 0) {
-                countdownTimer.textContent = `Generating Link in ${timeLeft}s...`;
-            } else {
-                clearInterval(countdownInterval);
-                countdownContainer.classList.add('hidden'); // Hide countdown container
-                finalDownloadLink.href = downloadUrl; // Set the actual download URL
-                finalDownloadLink.classList.remove('hidden'); // Show the final download link
-                finalDownloadLink.click(); // Automatically click the link to open in new tab
-                
-                // No setTimeout to re-show original button. The final link stays visible.
-            }
-        }, 1000); // Update every 1 second
+        const descriptionHtml = `
+            <p><strong>Genre:</strong> ${game.description.genre}</p>
+            <p><strong>Platform:</strong> ${game.description.platform}</p>
+            <p><strong>Mod Features:</strong> ${game.description.modFeatures}</p>
+            <p>${game.description.overview}</p>
+            <h4>Key Features:</h4>
+            <ul>
+                ${game.description.keyFeatures.map(feature => `<li>${feature}</li>`).join('')}
+            </ul>
+            ${game.description.whyChooseMod ? `
+            <h4>Why Choose Our Mod?</h4>
+            <ul>
+                ${game.description.whyChooseMod.map(reason => `<li>${reason}</li>`).join('')}
+            </ul>
+            ` : ''}
+        `;
+        detailGameDescription.innerHTML = descriptionHtml;
+
+        // Reset countdown and hide elements
+        if (currentDownloadCountdownInterval) {
+            clearInterval(currentDownloadCountdownInterval);
+        }
+        countdownContainer.classList.add('hidden');
+        finalDownloadLink.classList.add('hidden');
+        finalDownloadLink.href = '#'; // Reset href
+        openDownloadProcessButton.classList.remove('hidden'); // Show download button
+
+        // Set up the download button for the detail page
+        openDownloadProcessButton.onclick = () => startDownloadCountdown(game.downloadUrl);
+        
+        // Ensure telegram button is linked to the game's Telegram URL if available, otherwise hide
+        if (game.telegramUrl) {
+            telegramLinkButton.href = game.telegramUrl;
+            telegramLinkButton.classList.remove('hidden');
+        } else {
+            telegramLinkButton.classList.add('hidden');
+        }
     }
 
     backToHomeButton.addEventListener('click', () => {
-        contentSections.forEach(section => section.classList.add('hidden'));
-        newGamesSection.classList.remove('hidden');
-        allGamesSection.classList.remove('hidden');
-        searchInput.value = '';
-        performSearch();
+        showSection(allGamesSection);
+        newGamesSection.classList.remove('hidden'); // Show new games section when returning home
+        searchInput.value = ''; // Clear search input
+        allGamesTitle.textContent = 'All Games'; // Reset title
+        renderAllGamesGrid(gamesData); // Re-render all games
+        renderNewGamesSwiper(gamesData); // Re-render new games
         
-        // Ensure download elements are reset when going back home
-        openDownloadProcessButton.classList.remove('hidden');
-        countdownContainer.classList.add('hidden');
+        // Clear any active countdown if user goes back to home
+        if (currentDownloadCountdownInterval) {
+            clearInterval(currentDownloadCountdownInterval);
+            countdownContainer.classList.add('hidden');
+            finalDownloadLink.classList.add('hidden');
+            openDownloadProcessButton.classList.remove('hidden');
+        }
+    });
+
+    // --- Download Countdown Logic ---
+    function startDownloadCountdown(downloadUrl) {
+        openDownloadProcessButton.classList.add('hidden');
+        countdownContainer.classList.remove('hidden');
         finalDownloadLink.classList.add('hidden');
-    });
 
-    // --- Modal Logic (kept if still needed for other purposes, but the main download flow bypasses it) ---
-    function showDownloadModal(game) {
-        // This modal logic is now largely bypassed by the new direct download method
-        // But if you have other uses for a modal, it can remain.
-        downloadLinksContainer.innerHTML = '';
-        iframeContainer.classList.add('hidden');
-        contentIframe.src = '';
-        
-        if (game.downloadUrl) {
-            modalDescription.classList.remove('hidden');
-            const button = document.createElement('button');
-            button.classList.add('download-link');
-            button.innerHTML = `⚡ Fast Download`;
-            button.addEventListener('click', () => {
-                downloadLinksContainer.classList.add('hidden');
-                modalDescription.classList.add('hidden');
-                iframeContainer.classList.remove('hidden');
-                contentIframe.src = game.downloadUrl;
-            });
-            downloadLinksContainer.appendChild(button);
-        } else {
-            downloadLinksContainer.innerHTML = '<p>Download links not available for this game currently.</p>';
-            modalDescription.classList.add('hidden');
-        }
-        
-        downloadLinksContainer.classList.remove('hidden');
-        modalDescription.classList.remove('hidden');
-        downloadModal.style.display = 'flex';
+        let timeLeft = 10;
+        countdownTimer.textContent = timeLeft;
+
+        currentDownloadCountdownInterval = setInterval(() => {
+            timeLeft--;
+            countdownTimer.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(currentDownloadCountdownInterval);
+                countdownContainer.classList.add('hidden');
+                finalDownloadLink.href = downloadUrl;
+                finalDownloadLink.classList.remove('hidden');
+            }
+        }, 1000);
     }
 
-    function closeModal() {
-        downloadModal.style.display = 'none';
-        iframeContainer.classList.add('hidden');
-        contentIframe.src = '';
-    }
-
-    closeModalButton.addEventListener('click', closeModal);
-    window.addEventListener('click', (event) => {
-        if (event.target == downloadModal) {
-            closeModal();
-        }
-    });
-
-    // --- Initial Page Load ---
+    // --- Initial Render ---
     renderNewGamesSwiper(gamesData);
     renderAllGamesGrid(gamesData);
 });
